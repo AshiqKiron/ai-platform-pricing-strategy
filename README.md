@@ -105,4 +105,22 @@ ai-platform-pricing-strategy/
 ├── models/
 │   └── tco_calculator.py         # Python CLI script generating baseline data
 └── outputs/
-    └── tco_comparison.csv        # Generated spreadsheet data```
+    └── tco_comparison.csv        # Generated spreadsheet data
+```
+
+---
+
+## 🚀 How to Run Locally
+You don't need to install anything to view the demo, but if you want to run the Python backend financial model:
+
+```
+Clone the repository:
+Install Python dependencies:
+Run the TCO calculator:
+Check the outputs/ folder for the generated CSV.
+```
+
+## 🔮 Future Work
+1. Real API Integration: Connect the frontend calculator to live pricing APIs from AWS, GCP, and RunPod to show real-time, up-to-the-minute price comparisons.
+2. Multi-Cloud Arbitrage: Expand the Tier 3 model to show how the platform could automatically shift training workloads between AWS, GCP, and Azure based on real-time spot pricing fluctuations.
+3. Carbon Footprint Tracking: Add a "Green TCO" metric to the calculator, showing not just dollar savings, but carbon emission reductions achieved by eliminating idle GPU compute.
