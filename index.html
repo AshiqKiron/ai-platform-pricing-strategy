@@ -3,89 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Infra TCO Calculator</title>
+    <title>AI Infra Pricing Calculator</title>
+    <!-- Free CDN for Tailwind CSS (Styling) and Chart.js (Graphs) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .input-group { @apply flex flex-col mb-4; }
-        .input-label { @apply text-sm font-medium text-gray-700 mb-1; }
-        .input-field { @apply px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500; }
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: #f9fafb; }
+        .card { background: white; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+        input[type=number], select { 
+            width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; 
+            focus:outline-none focus:ring-2 focus:ring-blue-500;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="text-gray-800">
 
-    <div class="max-w-6xl mx-auto p-6">
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">💰 AI Infrastructure TCO & ROI Calculator</h1>
-            <p class="text-gray-600 mt-2">Proving that Efficiency-Aligned Pricing beats Legacy Compute pricing.</p>
+            <h1 class="text-3xl font-bold text-gray-900">💰 AI Infrastructure TCO Calculator</h1>
+            <p class="text-gray-600 mt-2">Select a workload or adjust parameters to see real-time pricing changes.</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Inputs Panel -->
-            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">🎛️ Workload Parameters</h2>
-                
-                <div class="input-group">
-                    <label class="input-label">Number of GPUs</label>
-                    <input type="number" id="numGpus" value="100" class="input-field" oninput="calculate()">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Training Duration (Hours)</label>
-                    <input type="number" id="hours" value="720" class="input-field" oninput="calculate()">
-                </div>
-
-                <h3 class="text-lg font-semibold mt-6 mb-3 text-gray-800">💲 Pricing ($/GPU/hr)</h3>
-                <div class="input-group">
-                    <label class="input-label">Legacy On-Demand</label>
-                    <input type="number" step="0.1" id="priceOndemand" value="2.50" class="input-field" oninput="calculate()">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Raw Spot</label>
-                    <input type="number" step="0.1" id="priceRawSpot" value="0.80" class="input-field" oninput="calculate()">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Proposed Managed Spot</label>
-                    <input type="number" step="0.1" id="priceManaged" value="1.00" class="input-field" oninput="calculate()">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- LEFT COLUMN: INPUTS -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Workload Selector -->
+                <div class="card p-5">
+                    <h2 class="text-lg font-semibold mb-3 text-blue-700">🎯 Select Workload Preset</h2>
+                    <select id="workloadPreset" onchange="applyPreset()" class="text-lg font-medium">
+                        <option value="custom">-- Custom / Manual --</option>
+                        <option value="sandbox">Tier 1: Dev / Sandbox (10 GPUs)</option>
+                        <option value="standard" selected>Tier 2: Standard Training (100 GPUs)</option>
+                        <option value="enterprise">Tier 3: Enterprise LLM (500 GPUs)</option>
+                    </select>
                 </div>
 
-                <h3 class="text-lg font-semibold mt-6 mb-3 text-gray-800">⚙️ Overhead & Waste</h3>
-                <div class="input-group">
-                    <label class="input-label">On-Demand Idle Waste (%)</label>
-                    <input type="number" id="wastePct" value="20" class="input-field" oninput="calculate()">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Raw Spot Interruption Overhead (%)</label>
-                    <input type="number" id="interruptPct" value="15" class="input-field" oninput="calculate()">
-                </div>
-                <div class="input-group">
-                    <label class="input-label">Manual Eng. Overhead ($)</label>
-                    <input type="number" id="engOverhead" value="6000" class="input-field" oninput="calculate()">
+                <!-- Parameters -->
+                <div class="card p-5">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-800">🎛️ Workload Parameters</h2>
+                    
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Number of GPUs</label>
+                    <input type="number" id="numGpus" value="100" class="mb-4" oninput="calculate()">
+                    
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Training Duration (Hours)</label>
+                    <input type="number" id="hours" value="720" class="mb-4" oninput="calculate()">
+
+                    <h3 class="text-md font-semibold mt-4 mb-2 text-gray-700">💲 Pricing ($/GPU/hr)</h3>
+                    <label class="block text-xs text-gray-500">Legacy On-Demand</label>
+                    <input type="number" step="0.1" id="priceOndemand" value="2.50" class="mb-3" oninput="calculate()">
+                    
+                    <label class="block text-xs text-gray-500">Raw Spot</label>
+                    <input type="number" step="0.1" id="priceRawSpot" value="0.80" class="mb-3" oninput="calculate()">
+                    
+                    <label class="block text-xs text-gray-500">Proposed Managed Spot</label>
+                    <input type="number" step="0.1" id="priceManaged" value="1.00" class="mb-3" oninput="calculate()">
+
+                    <h3 class="text-md font-semibold mt-4 mb-2 text-gray-700">⚙️ Overhead & Waste</h3>
+                    <label class="block text-xs text-gray-500">On-Demand Idle Waste (%)</label>
+                    <input type="number" id="wastePct" value="20" class="mb-3" oninput="calculate()">
+                    
+                    <label class="block text-xs text-gray-500">Raw Spot Interruption Overhead (%)</label>
+                    <input type="number" id="interruptPct" value="15" class="mb-3" oninput="calculate()">
+                    
+                    <label class="block text-xs text-gray-500">Manual Eng. Overhead ($)</label>
+                    <input type="number" id="engOverhead" value="6000" class="mb-1" oninput="calculate()">
                 </div>
             </div>
 
-            <!-- Results & Chart Panel -->
+            <!-- RIGHT COLUMN: RESULTS -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- The "Aha" Metric -->
-                <div id="ahaBox" class="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-xl shadow-sm">
+                <div class="bg-green-50 border-l-4 border-green-500 p-5 rounded-r-xl shadow-sm">
                     <p class="text-sm font-medium text-green-800 uppercase tracking-wide">The 'Aha' Moment</p>
-                    <p class="text-2xl font-bold text-green-900 mt-1">Switch to Managed Spot to save <span id="savingsAmount">$0</span></p>
-                    <p class="text-green-700 mt-1">That's a <span id="savingsPct" class="font-bold">0%</span> reduction in Training TCO!</p>
+                    <p class="text-2xl font-bold text-green-900 mt-1">Switch to Managed Spot to save <span id="savingsAmount" class="text-3xl">$0</span></p>
+                    <p class="text-green-700 mt-1">That's a <span id="savingsPct" class="font-bold text-xl">0%</span> reduction in Training TCO!</p>
                 </div>
 
                 <!-- Metric Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                    <div class="card p-5 border-l-4 border-l-red-500">
                         <p class="text-sm text-gray-500">Legacy On-Demand</p>
                         <p class="text-2xl font-bold text-red-600" id="tcoOndemand">$0</p>
                         <p class="text-xs text-gray-400 mt-1">Includes idle waste</p>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                    <div class="card p-5 border-l-4 border-l-yellow-500">
                         <p class="text-sm text-gray-500">Legacy Raw Spot</p>
                         <p class="text-2xl font-bold text-yellow-600" id="tcoRawSpot">$0</p>
                         <p class="text-xs text-gray-400 mt-1">Includes eng. overhead</p>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-green-200 bg-green-50">
+                    <div class="card p-5 border-l-4 border-l-green-500 bg-green-50">
                         <p class="text-sm text-green-700 font-medium">Proposed Managed Spot</p>
                         <p class="text-2xl font-bold text-green-700" id="tcoManaged">$0</p>
                         <p class="text-xs text-green-600 mt-1">0% waste / 0 overhead</p>
@@ -93,27 +100,42 @@
                 </div>
 
                 <!-- Chart -->
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 TCO Breakdown</h3>
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">📊 TCO Breakdown Comparison</h3>
                     <canvas id="tcoChart"></canvas>
                 </div>
             </div>
         </div>
         
-        <footer class="text-center text-gray-400 text-sm mt-12">
-            Built for Project 1: Value-Based Pricing & Packaging for AI Platforms.
+        <footer class="text-center text-gray-400 text-sm mt-10">
+            Interactive Demo for Project 1: Value-Based Pricing & Packaging for AI Platforms.
         </footer>
     </div>
 
     <script>
         let chart;
 
+        // --- PRESET WORKLOADS ---
+        function applyPreset() {
+            const preset = document.getElementById('workloadPreset').value;
+            const gpus = document.getElementById('numGpus');
+            const hours = document.getElementById('hours');
+
+            if (preset === 'sandbox') { gpus.value = 10; hours.value = 100; }
+            else if (preset === 'standard') { gpus.value = 100; hours.value = 720; }
+            else if (preset === 'enterprise') { gpus.value = 500; hours.value = 1500; }
+            
+            calculate(); // Recalculate when preset changes
+        }
+
+        // --- FORMATTING ---
         function formatCurrency(num) {
             return '$' + num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
+        // --- CORE CALCULATION LOGIC ---
         function calculate() {
-            // Get Inputs
+            // 1. Get Inputs
             const gpus = parseFloat(document.getElementById('numGpus').value) || 0;
             const hours = parseFloat(document.getElementById('hours').value) || 0;
             const pOndemand = parseFloat(document.getElementById('priceOndemand').value) || 0;
@@ -123,34 +145,32 @@
             const interruptPct = (parseFloat(document.getElementById('interruptPct').value) || 0) / 100;
             const engOverhead = parseFloat(document.getElementById('engOverhead').value) || 0;
 
-            // Calculations
+            // 2. Calculate TCOs
             const tcoOndemand = gpus * hours * pOndemand;
-            
             const effectiveHours = hours / (1 - interruptPct);
             const tcoRawSpot = (gpus * effectiveHours * pRawSpot) + engOverhead;
-            
             const tcoManaged = gpus * hours * pManaged;
 
             const savings = tcoOndemand - tcoManaged;
             const savingsPct = tcoOndemand > 0 ? (savings / tcoOndemand) * 100 : 0;
 
-            // Update UI
+            // 3. Update UI Text
             document.getElementById('tcoOndemand').innerText = formatCurrency(tcoOndemand);
             document.getElementById('tcoRawSpot').innerText = formatCurrency(tcoRawSpot);
             document.getElementById('tcoManaged').innerText = formatCurrency(tcoManaged);
-            
             document.getElementById('savingsAmount').innerText = formatCurrency(savings);
             document.getElementById('savingsPct').innerText = savingsPct.toFixed(1) + '%';
 
-            // Update Chart
-            updateChart(tcoOndemand, tcoRawSpot, tcoManaged, wastePct, interruptPct, engOverhead, pOndemand, pRawSpot, pManaged, gpus, hours);
+            // 4. Update Chart
+            updateChart(tcoOndemand, tcoRawSpot, tcoManaged, wastePct, engOverhead, pRawSpot, gpus, hours, interruptPct);
         }
 
-        function updateChart(tcoOnd, tcoRaw, tcoMan, wastePct, intPct, engOvh, pOnd, pRaw, pMan, gpus, hours) {
+        // --- CHART RENDERING ---
+        function updateChart(tcoOnd, tcoRaw, tcoMan, wastePct, engOvh, pRaw, gpus, hours, intPct) {
             const ctx = document.getElementById('tcoChart').getContext('2d');
             
-            // Calculate hidden costs for stacking
-            const hiddenOnd = tcoOnd * wastePct; // Note: in this simplified model, waste is baked into the high rate, but we visualize the "effective" loss
+            // Calculate hidden costs for the stacked bar chart
+            const hiddenOnd = tcoOnd * wastePct; 
             const computeOnd = tcoOnd - hiddenOnd; 
             
             const computeRaw = (gpus * (hours / (1 - intPct)) * pRaw);
@@ -160,14 +180,14 @@
                 labels: ['Legacy On-Demand', 'Legacy Raw Spot', 'Proposed Managed Spot'],
                 datasets: [
                     {
-                        label: 'Compute Cost',
+                        label: 'Base Compute Cost',
                         data: [computeOnd, computeRaw, tcoMan],
-                        backgroundColor: '#3b82f6',
+                        backgroundColor: '#3b82f6', // Blue
                     },
                     {
                         label: 'Hidden Costs / Waste',
                         data: [hiddenOnd, hiddenRaw, 0],
-                        backgroundColor: '#ef4444',
+                        backgroundColor: '#ef4444', // Red
                     }
                 ]
             };
@@ -199,7 +219,7 @@
             }
         }
 
-        // Initial calculation on load
+        // Run on initial page load
         window.onload = calculate;
     </script>
 </body>
