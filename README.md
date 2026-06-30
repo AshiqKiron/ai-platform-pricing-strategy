@@ -1,7 +1,6 @@
 # 💰 AI Platform Value-Based Pricing & Packaging Strategy
 
-🚀 **[LIVE INTERACTIVE DEMO: TCO & ROI Calculator](https://your-username.github.io/your-repo-name/)** 🚀  
-*(Replace the link above with your actual GitHub Pages URL)*
+🚀 **[LIVE INTERACTIVE DEMO: TCO & ROI Calculator](https://ashiqkiron.github.io/ai-platform-pricing-strategy/)** 🚀  
 
 ---
 
@@ -106,4 +105,4 @@ ai-platform-pricing-strategy/
 ├── models/
 │   └── tco_calculator.py         # Python CLI script generating baseline data
 └── outputs/
-    └── tco_comparison.csv        # Generated spreadsheet data
+    └── tco_comparison.csv        # Generated spreadsheet data```
